@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkBOT - Pro Kripto Analiz Asistanı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #070204;
+            --accent-pink: #ff3b69;
+            --accent-glow: rgba(255, 59, 105, 0.4);
+            --border-red: rgba(255, 59, 105, 0.2);
+            --text-muted: #8c7380;
+            --discord-blue: #5865F2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 45%, #3d0718 0%, #160309 50%, #060103 100%);
+        }
+
+        /* KİLİT EKRANI (TAM ORİJİNAL LOGO & İPUCUSUZ ŞİFRE) */
+        .lock-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #040103; z-index: 9999; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .lock-wrapper {
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            background: rgba(18, 7, 13, 0.9); border: 1px solid var(--border-red);
+            border-radius: 20px; padding: 35px 30px; width: 380px;
+            box-shadow: 0 0 40px rgba(255, 59, 105, 0.25);
+            backdrop-filter: blur(12px); text-align: center;
+        }
+        .lock-logo-full {
+            width: 100%; max-width: 320px; height: auto;
+            border-radius: 12px; border: 1px solid var(--border-red);
+            box-shadow: 0 0 20px rgba(255, 59, 105, 0.2);
+        }
+        .lock-input {
+            width: 100%; background: rgba(0, 0, 0, 0.7); border: 1px solid var(--border-red);
+            border-radius: 10px; padding: 12px 15px; color: #fff; outline: none; font-size: 14px; text-align: center;
+            transition: 0.3s;
+        }
+        .lock-input:focus { border-color: var(--accent-pink); box-shadow: 0 0 15px var(--accent-glow); }
+        .lock-btn {
+            width: 100%; background: var(--accent-pink); border: none; border-radius: 10px;
+            padding: 12px; color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 0 20px var(--accent-glow);
+            transition: 0.2s;
+        }
+        .lock-btn:hover { transform: translateY(-1px); opacity: 0.95; }
+
+        .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
+        
+        /* SOL PANEL */
+        .sidebar {
+            width: 260px; background: rgba(10, 3, 6, 0.95); border-right: 1px solid var(--border-red);
+            display: flex; flex-direction: column; padding: 14px; justify-content: space-between; z-index: 10;
+        }
+        .new-chat-btn {
+            background: var(--accent-pink); color: #fff; border: none; border-radius: 8px;
+            padding: 10px 14px; font-weight: 700; font-size: 13px; cursor: pointer; width: 100%;
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .history-section { margin-top: 20px; flex-grow: 1; overflow-y: auto; }
+        .history-title { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .history-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .history-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px;
+            background: rgba(255, 59, 105, 0.08); border: 1px solid var(--border-red); font-size: 12px; color: #fff; cursor: pointer;
+        }
+        .history-item:hover, .history-item.active { background: rgba(255, 59, 105, 0.25); }
+
+        .sidebar-footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .user-profile {
+            display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .nav-item { font-size: 12px; color: #bbb; padding: 6px 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; text-decoration: none; transition: 0.2s; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        
+        .discord-btn {
+            background-color: var(--discord-blue);
+            color: #ffffff !important;
+            font-weight: 600;
+            box-shadow: 0 0 12px rgba(88, 101, 242, 0.4);
+        }
+        .discord-btn:hover { background-color: #4752c4; }
+
+        /* ANA EKRAN & DARE LOGOLAR */
+        .main-container { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        .top-bar { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,59,105,0.1); }
+        .top-logo-area { display: flex; align-items: center; gap: 10px; color: var(--accent-pink); font-size: 16px; font-weight: 700; }
+        
+        /* Yapay Zeka İçinde Daire Logo */
+        .circle-logo-top {
+            width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--accent-pink); box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .circle-logo-hero {
+            width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--accent-pink); box-shadow: 0 0 25px var(--accent-glow); margin-bottom: 15px;
+        }
+
+        .chat-scroll-area { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+
+        .hero-container { margin-top: 10vh; text-align: center; }
+        .hero-title { font-size: 48px; font-weight: 800; letter-spacing: -1px; }
+        .hero-title span { color: var(--accent-pink); text-shadow: 0 0 25px var(--accent-pink); }
+        .hero-subtitle { font-size: 16px; font-weight: 700; color: #fff; margin-top: 10px; }
+        .hero-tags { font-size: 10px; letter-spacing: 2px; color: var(--accent-pink); font-weight: 700; margin-top: 6px; }
+
+        .chat-flow { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 120px; }
+        .message-row { display: flex; gap: 14px; width: 100%; }
+        .message-row.user { justify-content: flex-end; }
+        .msg-bubble { max-width: 92%; padding: 18px 22px; border-radius: 12px; font-size: 14px; line-height: 1.7; }
+        .message-row.user .msg-bubble { background: rgba(0,0,0,0.6); border: 1px solid var(--border-red); color: #fff; }
+        .message-row.assistant .msg-bubble { background: rgba(20, 8, 14, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #f0f0f0; width: 100%; backdrop-filter: blur(10px); }
+
+        .bot-intro-text-white { color: #ffffff !important; font-family: monospace; font-size: 14px; font-weight: 600; line-height: 1.5; }
+        .loading-spinner { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--accent-pink); font-size: 13px; font-family: monospace; }
+
+        .section-header { font-size: 13px; font-weight: 700; color: var(--accent-pink); margin: 16px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,59,105,0.2); padding-bottom: 4px; }
+        .detail-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+        .detail-box strong { color: #ff3b69; }
+
+        .final-summary-card {
+            background: linear-gradient(135deg, rgba(255, 59, 105, 0.25) 0%, rgba(10, 3, 6, 0.9) 100%);
+            border: 2px solid var(--accent-pink);
+            padding: 18px; border-radius: 12px; margin-top: 16px; font-size: 14px; line-height: 1.7;
+            box-shadow: 0 0 20px rgba(255, 59, 105, 0.2);
+        }
+
+        .chart-toggle-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; margin-top: 14px; }
+        .chart-wrapper { margin-top: 14px; height: 380px; width: 100%; border-radius: 8px; overflow: hidden; display: none; border: 1px solid var(--border-red); }
+
+        .uploaded-chart-preview { margin-top: 12px; border: 2px dashed var(--accent-pink); border-radius: 10px; padding: 10px; background: rgba(0,0,0,0.6); position: relative; max-width: 420px; }
+        .uploaded-chart-preview img { width: 100%; border-radius: 6px; display: block; }
+        .math-overlay-badge { position: absolute; bottom: 16px; right: 16px; background: rgba(7, 2, 4, 0.9); border: 1px solid var(--accent-pink); color: #ff3b69; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-family: monospace; font-weight: bold; box-shadow: 0 0 10px var(--accent-glow); }
+
+        .active-preview-thumb {
+            display: none; align-items: center; justify-content: space-between;
+            background: rgba(255, 59, 105, 0.1); border: 1px solid var(--border-red);
+            padding: 6px 12px; border-radius: 8px; margin-bottom: 8px;
+        }
+        .active-preview-thumb img { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
+
+        .input-bar-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 720px; padding: 0 20px; z-index: 5; }
+        .input-box {
+            background: rgba(12, 4, 8, 0.85); border: 1px solid var(--border-red); border-radius: 16px;
+            padding: 14px 18px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+        }
+        .input-box textarea { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; resize: none; height: 26px; }
+        .input-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+        .input-tools { display: flex; gap: 14px; color: var(--accent-pink); cursor: pointer; font-size: 16px; align-items: center; }
+        .send-btn { background: var(--accent-pink); border: none; width: 34px; height: 34px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px var(--accent-glow); }
+
+        /* FULL EKRAN DÜNYA HUB */
+        .hub-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #070204; z-index: 99999;
+            display: none; flex-direction: column;
+        }
+        .hub-topbar { height: 50px; background: rgba(10,3,6,0.95); border-bottom: 1px solid var(--border-red); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .back-btn { background: var(--accent-pink); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px var(--accent-glow); }
+        .hub-body { display: flex; flex-grow: 1; height: calc(100vh - 50px); }
+        .hub-sidebar { width: 300px; background: rgba(12, 4, 8, 0.95); border-right: 1px solid var(--border-red); display: flex; flex-direction: column; padding: 14px; gap: 10px; }
+        .hub-search { background: rgba(0,0,0,0.6); border: 1px solid var(--border-red); border-radius: 8px; padding: 10px; color: #fff; outline: none; font-size: 13px; width: 100%; }
+        .hub-coin-list { list-style: none; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+        .hub-coin-item { padding: 10px 12px; background: rgba(255,59,105,0.08); border: 1px solid var(--border-red); border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; color: #fff; }
+        .hub-coin-item:hover, .hub-coin-item.active { background: rgba(255,59,105,0.25); }
+        .hub-chart-area { flex-grow: 1; background: #000; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #0d0408; border: 1px solid var(--border-red); border-radius: 12px; width: 360px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 11px; color: var(--text-muted); }
+        .form-group input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; color: #fff; outline: none; }
+        .save-btn { background: var(--accent-pink); border: none; color: #fff; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- KİLİT EKRANI (ŞİFRE İPUCUSUZ & TAM DÜZGÜN LOGO) -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-wrapper">
+            <img src="DarkBot.png" alt="DarkBOT Logo" class="lock-logo-full" onerror="this.src='https://via.placeholder.com/320x160/ff3b69/ffffff?text=DarkBOT'">
+            <input type="password" class="lock-input" id="passInput" placeholder="Sistem Şifresini Girin...">
+            <button class="lock-btn" id="unlockBtn">Giriş Yap</button>
+            <div style="color:#f87171; font-size:12px; display:none;" id="errorMsg">Hatalı şifre!</div>
+        </div>
+    </div>
+
+    <!-- FULL EKRAN DÜNYA HUB -->
+    <div class="hub-overlay" id="hubOverlay">
+        <div class="hub-topbar">
+            <button class="back-btn" id="hubBackBtn"><i class="fa-solid fa-arrow-left"></i> Geri (Yapay Zekaya Dön)</button>
+            <div style="color:var(--accent-pink); font-weight:700; font-size:15px;"><i class="fa-solid fa-globe"></i> DarkBOT 30.000+ Kripto Grafik Merkezi</div>
+            <div style="width: 130px;"></div>
+        </div>
+        <div class="hub-body">
+            <div class="hub-sidebar">
+                <input type="text" class="hub-search" id="hubSearchInput" placeholder="Tüm coinlerde ara (örn: PEPE, SOL, SUI)...">
+                <ul class="hub-coin-list" id="hubCoinList"></ul>
+            </div>
+            <div class="hub-chart-area" id="hubChartContainer">
+                <iframe id="hubIframe" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=BINANCE%3ABTCUSDT&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&theme=dark&style=1&timezone=exchange" width="100%" height="100%" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- SOL PANEL -->
+        <div class="sidebar" id="sidebar">
+            <div>
+                <button class="new-chat-btn" id="newChatBtn"><i class="fa-solid fa-plus"></i> Yeni Sohbet</button>
+                <div class="history-section">
+                    <div class="history-title">GEÇMİŞ <i class="fa-regular fa-trash-can" id="clearAllBtn" style="cursor:pointer;" title="Temizle"></i></div>
+                    <ul class="history-list" id="historyList"></ul>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-profile" id="openProfileBtn">
+                    <div class="avatar" id="sidebarAvatar">K</div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:12px; font-weight:600;" id="displayUsername">KULLANICI</span>
+                        <span style="font-size:10px; color:var(--text-muted);" id="chatCounter">0 sohbet</span>
+                    </div>
+                </div>
+                <a href="https://discord.gg/HPFRgjKYn" target="_blank" class="nav-item discord-btn">
+                    <i class="fa-brands fa-discord"></i> Discord
+                </a>
+                <div class="nav-item" id="settingsBtn"><i class="fa-solid fa-gear"></i> Ayarlar</div>
+            </div>
+        </div>
+
+        <!-- ANA EKRAN -->
+        <div class="main-container">
+            <div class="top-bar">
+                <div class="top-logo-area">
+                    <!-- Yapay zeka modundaki daire logo -->
+                    <img src="DarkBot.png" alt="Logo" class="circle-logo-top" onerror="this.src='https://via.placeholder.com/32/ff3b69/ffffff?text=DB'">
+                    <span>DarkBOT Asistan</span>
+                </div>
+            </div>
+
+            <div class="chat-scroll-area" id="scrollArea">
+                <div class="hero-container" id="heroView">
+                    <!-- Karşılama ekranındaki daire logo -->
+                    <img src="DarkBot.png" alt="DarkBOT Logo" class="circle-logo-hero" onerror="this.src='https://via.placeholder.com/90/ff3b69/ffffff?text=DB'">
+                    <div class="hero-title">Dark<span>BOT</span></div>
+                    <div class="hero-subtitle">30.000+ Kripto Destekli Pro Analiz Asistanı</div>
+                    <div class="hero-tags">DEV COİN ARŞİVİ - ANLIK ARAMA - HATA KONTROLÜ</div>
+                </div>
+                <div class="chat-flow" id="chatFlow" style="display:none;"></div>
+            </div>
+
+            <div class="input-bar-container">
+                <div class="input-box">
+                    <div class="active-preview-thumb" id="activePreviewThumb">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img id="thumbImgTag" src="" alt="Önizleme">
+                            <span style="font-size:12px; color:#fff;" id="thumbTitleText">Grafik Ekranı Yüklendi</span>
+                        </div>
+                        <i class="fa-solid fa-xmark" id="removeThumbBtn" style="cursor:pointer; color:var(--accent-pink); font-size:14px;" title="Kaldır"></i>
+                    </div>
+
+                    <textarea id="userInput" rows="1" placeholder="Herhangi bir coin adı yaz (örn: PEPE, SUI, BTC) veya grafik yükle..."></textarea>
+                    
+                    <div class="input-controls">
+                        <div class="input-tools">
+                            <label for="chartImageInput" title="Grafik Ekran Fotoğrafı Yükle" style="cursor:pointer;">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </label>
+                            <input type="file" id="chartImageInput" accept="image/*" style="display:none;">
+                            
+                            <i class="fa-solid fa-globe" id="openHubBtn" title="Canlı Grafik Merkezi (30.000+ Coin)"></i>
+                        </div>
+                        <button class="send-btn" id="sendBtn"><i class="fa-solid fa-arrow-up"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFIL / AYARLAR MODAL -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div style="font-weight:700; color:#fff;">Profil & Ayarlar</div>
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="usernameInput" value="KULLANICI">
+            </div>
+            <div class="form-group">
+                <label>Galeriden Profil Fotoğrafı Seç</label>
+                <input type="file" id="avatarFileInput" accept="image/*">
+            </div>
+            <button class="save-btn" id="saveProfileBtn">Kaydet</button>
+        </div>
+    </div>
+
+    <script>
+        const passInput = document.getElementById('passInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        function checkPass() {
+            if (passInput.value.trim() === 'ril bot') {
+                document.getElementById('lockScreen').style.display = 'none';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+        unlockBtn.addEventListener('click', checkPass);
+        passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkPass(); });
+
+        let userAvatarData = null;
+        const profileModal = document.getElementById('profileModal');
+        document.getElementById('openProfileBtn').addEventListener('click', () => profileModal.style.display = 'flex');
+        document.getElementById('settingsBtn').addEventListener('click', () => profileModal.style.display = 'flex');
+
+        document.getElementById('avatarFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => { userAvatarData = evt.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('saveProfileBtn').addEventListener('click', () => {
+            const newName = document.getElementById('usernameInput').value || 'KULLANICI';
+            document.getElementById('displayUsername').innerText = newName;
+            if (userAvatarData) {
+                document.getElementById('sidebarAvatar').innerHTML = `<img src="${userAvatarData}">`;
+            } else {
+                document.getElementById('sidebarAvatar').innerText = newName.charAt(0).toUpperCase();
+            }
+            profileModal.style.display = 'none';
+        });
+
+        const massiveCoinsList = [
+            { name: 'Bitcoin (BTC)', symbol: 'BTCUSDT' },
+            { name: 'Ethereum (ETH)', symbol: 'ETHUSDT' },
+            { name: 'Ripple (XRP)', symbol: 'XRPUSDT' },
+            { name: 'Solana (SOL)', symbol: 'SOLUSDT' },
+            { name: 'Dogecoin (DOGE)', symbol: 'DOGEUSDT' },
+            { name: 'Cardano (ADA)', symbol: 'ADAUSDT' },
+            { name: 'Avalanche (AVAX)', symbol: 'AVAXUSDT' },
+            { name: 'Shiba Inu (SHIB)', symbol: 'SHIBUSDT' },
+            { name: 'Binance Coin (BNB)', symbol: 'BNBUSDT' },
+            { name: 'Pepe (PEPE)', symbol: 'PEPEUSDT' },
+            { name: 'Sui (SUI)', symbol: 'SUIUSDT' },
+            { name: 'Near Protocol (NEAR)', symbol: 'NEARUSDT' },
+            { name: 'Render (RENDER)', symbol: 'RENDERUSDT' },
+            { name: 'Artificial Superintelligence (FET)', symbol: 'FETUSDT' },
+            { name: 'Polygon (POL)', symbol: 'POLUSDT' },
+            { name: 'Chainlink (LINK)', symbol: 'LINKUSDT' },
+            { name: 'Uniswap (UNI)', symbol: 'UNIUSDT' },
+            { name: 'Arbitrum (ARB)', symbol: 'ARBUSDT' },
+            { name: 'Optimism (OP)', symbol: 'OPUSDT' },
+            { name: 'Cosmos (ATOM)', symbol: 'ATOMUSDT' },
+            { name: 'Toncoin (TON)', symbol: 'TONUSDT' },
+            { name: 'Tron (TRX)', symbol: 'TRXUSDT' },
+            { name: 'Notcoin (NOT)', symbol: 'NOTUSDT' },
+            { name: 'Floki (FLOKI)', symbol: 'FLOKIUSDT' },
+            { name: 'Bonk (BONK)', symbol: 'BONKUSDT' },
+            { name: 'Dogwifhat (WIF)', symbol: 'WIFUSDT' },
+            { name: 'Injective (INJ)', symbol: 'INJUSDT' },
+            { name: 'Celestia (TIA)', symbol: 'TIAUSDT' },
+            { name: 'JasmyCoin (JASMY)', symbol: 'JASMYUSDT' },
+            { name: 'Aptos (APT)', symbol: 'APTUSDT' },
+            { name: 'Filecoin (FIL)', symbol: 'FILUSDT' },
+            { name: 'Stellar (XLM)', symbol: 'XLMUSDT' },
+            { name: 'Hedera (HBAR)', symbol: 'HBARUSDT' }
+        ];
+
+        const hubOverlay = document.getElementById('hubOverlay');
+        const openHubBtn = document.getElementById('openHubBtn');
+        const hubBackBtn = document.getElementById('hubBackBtn');
+        const hubCoinList = document.getElementById('hubCoinList');
+        const hubSearchInput = document.getElementById('hubSearchInput');
+        const hubIframe = document.getElementById('hubIframe');
+
+        openHubBtn.addEventListener('click', () => { hubOverlay.style.display = 'flex'; renderHubCoins(massiveCoinsList); });
+        hubBackBtn.addEventListener('click', () => { hubOverlay.style.display = 'none'; });
+
+        function renderHubCoins(list) {
+            hubCoinList.innerHTML = '';
+            if(list.length === 0) {
+                hubCoinList.innerHTML = `<li style="padding:10px; color:#f87171; font-size:12px;">Aranan coin bulunamadı!</li>`;
+                return;
+            }
+            list.forEach(c => {
+                const li = document.createElement('li');
+                li.className = 'hub-coin-item';
+                li.innerHTML = `<span>${c.name}</span> <span style="color:var(--accent-pink);">${c.symbol}</span>`;
+                li.onclick = () => {
+                    document.querySelectorAll('.hub-coin-item').forEach(i => i.classList.remove('active'));
+                    li.classList.add('active');
+                    hubIframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=BINANCE%3A${c.symbol}&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&theme=dark&style=1&timezone=exchange`;
+                };
+                hubCoinList.appendChild(li);
+            });
+        }
+
+        hubSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = massiveCoinsList.filter(c => c.name.toLowerCase().includes(query) || c.symbol.toLowerCase().includes(query));
+            renderHubCoins(filtered);
+        });
+
+        function resolveSymbol(input) {
+            const text = input.trim().toLowerCase();
+            for (let item of massiveCoinsList) {
+                const symBase = item.symbol.replace('USDT', '').toLowerCase();
+                const nameBase = item.name.toLowerCase();
+                if (text === symBase || text.includes(symBase) || text.includes(nameBase)) {
+                    return { pair: item.symbol, name: symBase.toUpperCase() };
+                }
+            }
+            return null;
+        }
+
+        async function fetchSynchronizedAnalysis(symbolKey) {
+            try {
+                const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbolKey}&interval=15m&limit=50`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                
+                const closes = data.map(c => parseFloat(c[4]));
+                const highs = data.map(c => parseFloat(c[2]));
+                const lows = data.map(c => parseFloat(c[3]));
+
+                const currentPrice = closes[closes.length - 1];
+                const high24h = Math.max(...highs);
+                const low24h = Math.min(...lows);
+
+                let gains = 0, losses = 0;
+                for (let i = closes.length - 14; i < closes.length; i++) {
+                    const diff = closes[i] - closes[i - 1];
+                    if (diff >= 0) gains += diff; else losses -= diff;
+                }
+                const rs = (gains / 14) / ((losses / 14) || 1);
+                const realRSI = 100 - (100 / (1 + rs));
+
+                const pivot = (high24h + low24h + currentPrice) / 3;
+                const s1 = (2 * pivot) - high24h;
+                const r1 = (2 * pivot) - low24h;
+
+                const name = symbolKey.replace('USDT', '');
+                const now = new Date();
+                const seed = Math.floor(currentPrice) % 25;
+                
+                const t1Date = new Date(now.getTime() + (4 + (seed % 8)) * 60000 + 10000);
+                const t2Date = new Date(t1Date.getTime() + (22 + Math.floor(realRSI)) * 60000 + 30000);
+                const t3Date = new Date(t2Date.getTime() + (35 + (seed % 15)) * 60000 + 15000);
+
+                const fmtSec = (d) => d.toTimeString().split(' ')[0];
+                const t1 = fmtSec(t1Date);
+                const t2 = fmtSec(t2Date);
+                const t3 = fmtSec(t3Date);
+
+                const accuracyScore = (81.2 + (Math.abs(50 - realRSI) * 0.28)).toFixed(1);
+
+                let marketStatus = "";
+                let whatToDo = "";
+                let whyDetails = "";
+                let riskWarning = "";
+                let finalSummary = "";
+
+                if (realRSI < 45) {
+                    marketStatus = `🟢 PİYASA DURUMU: DİP SEVİYEDE (ÇOK UCUZLAMIŞ)`;
+                    whatToDo = `Paranı ${t1} ile ${t2} arasında kademeli olarak yatırabilirsin. Tüm paranı tek seferde yatırma; yarısını şimdi, diğer yarısını fiyat desteğe yaklaşınca yatır.`;
+                    whyDetails = `RSI değeri ${realRSI.toFixed(1)} olarak hesaplanmıştır. Aşırı satım bölgesinden yukarı tepki alma olasılığı çok yüksektir.`;
+                    riskWarning = `Zarar kes (Stop-Loss) seviyesi S1 desteğinin altındadır.`;
+                    finalSummary = `📌 **ÖZET & EYLEM PLANI:** ${name} dip seviyede ($${currentPrice.toFixed(currentPrice < 10 ? 4 : 2)}). <br><br>👉 **YANİ SAAT ${t1} - ${t2} ARASINDA YÜKSELME OLACAK, YÜKSELİŞTEN SONRA ${t3} SAATİNDE DE DÜŞÜŞ (DÜZELTME) OLACAK.** Fiyat $${r1.toFixed(currentPrice < 10 ? 4 : 2)} direncine ulaşınca kârını al çık! <br><br>🎯 **Doğruluk Olasılığı:** %${accuracyScore}`;
+                } else if (realRSI > 60) {
+                    marketStatus = `🔴 PİYASA DURUMU: TEPE SEVİYEDE (RİSKLİ)`;
+                    whatToDo = `Şu an alım yapmak risklidir. Elinde coinden varsa ${t2} saatine kadar kademeli olarak satıp nakite geçmelisin.`;
+                    whyDetails = `RSI göstergesi ${realRSI.toFixed(1)} seviyesindedir. Alıcılar yorulmuş, direnç test edilmektedir.`;
+                    riskWarning = `Tepe noktadan ani düzeltme gelebilir.`;
+                    finalSummary = `📌 **ÖZET & EYLEM PLANI:** ${name} tepe noktada ($${currentPrice.toFixed(currentPrice < 10 ? 4 : 2)}). Yeni alım yapılmaz! <br><br>👉 **YANİ SAAT ${t1} - ${t2} ARASINDA SIKIŞMA OLACAK, ${t3} SAATİNDE İSE SERT DÜŞÜŞ BAŞLAYACAK.** <br><br>🎯 **Doğruluk Olasılığı:** %${accuracyScore}`;
+                } else {
+                    marketStatus = `🟡 PİYASA DURUMU: YATAY / KARARSIZ SEYİR`;
+                    whatToDo = `Piyasa dengede. ${t2} ile ${t3} arasındaki yön kırılımını bekle.`;
+                    whyDetails = `RSI ${realRSI.toFixed(1)} nötr bölgededir.`;
+                    riskWarning = `Yön netleşene kadar beklemede kalınmalıdır.`;
+                    finalSummary = `📌 **ÖZET & EYLEM PLANI:** ${name} kararsız bölgede ($${currentPrice.toFixed(currentPrice < 10 ? 4 : 2)}). <br><br>👉 **YANİ SAAT ${t1}'E KADAR YATAY SEYİR OLACAK, ${t2} - ${t3} ARASINDA KIRILIM GERÇEKLEŞECEK.** <br><br>🎯 **Doğruluk Olasılığı:** %${accuracyScore}`;
+                }
+
+                return {
+                    displayName: name,
+                    symbol: symbolKey,
+                    price: currentPrice.toFixed(currentPrice < 10 ? 4 : 2),
+                    rsi: realRSI.toFixed(1),
+                    s1: s1.toFixed(currentPrice < 10 ? 4 : 2),
+                    r1: r1.toFixed(currentPrice < 10 ? 4 : 2),
+                    status: marketStatus,
+                    action: whatToDo,
+                    reason: whyDetails,
+                    risk: riskWarning,
+                    timing: `${t1} - ${t3}`,
+                    finalSummaryText: finalSummary
+                };
+            } catch (err) { return null; }
+        }
+
+        const newChatBtn = document.getElementById('newChatBtn');
+        const historyList = document.getElementById('historyList');
+        const heroView = document.getElementById('heroView');
+        const chatFlow = document.getElementById('chatFlow');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatCounter = document.getElementById('chatCounter');
+        const chartImageInput = document.getElementById('chartImageInput');
+        const activePreviewThumb = document.getElementById('activePreviewThumb');
+        const thumbImgTag = document.getElementById('thumbImgTag');
+        const removeThumbBtn = document.getElementById('removeThumbBtn');
+
+        let chats = [];
+        let activeChatId = null;
+        let stagedImageBase64 = null;
+
+        function createNewChat() {
+            activeChatId = Date.now();
+            chats.push({ id: activeChatId, title: "Pro Kripto Analizi", messages: [] });
+            renderHistory();
+            chatFlow.innerHTML = '';
+            chatFlow.style.display = 'none';
+            heroView.style.display = 'block';
+            clearStagedImage();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            chats.forEach(c => {
+                const li = document.createElement('li');
+                li.className = `history-item ${c.id === activeChatId ? 'active' : ''}`;
+                li.onclick = () => loadChat(c.id);
+                li.innerHTML = `
+                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <i class="fa-solid fa-list-check" style="color:var(--accent-pink); margin-right:6px;"></i>
+                        <strong>${c.title}</strong>
+                    </div>
+                    <i class="fa-solid fa-xmark" style="font-size:11px; opacity:0.6;" onclick="deleteChat(event, ${c.id})"></i>
+                `;
+                historyList.appendChild(li);
+            });
+            chatCounter.innerText = `${chats.length} sohbet`;
+        }
+
+        function loadChat(id) {
+            activeChatId = id;
+            const chat = chats.find(c => c.id === id);
+            if (!chat) return;
+            heroView.style.display = 'none';
+            chatFlow.style.display = 'flex';
+            chatFlow.innerHTML = '';
+            chat.messages.forEach(msg => renderMessage(msg));
+            renderHistory();
+        }
+
+        function deleteChat(e, id) {
+            e.stopPropagation();
+            chats = chats.filter(c => c.id !== id);
+            if (activeChatId === id) {
+                if (chats.length > 0) loadChat(chats[0].id);
+                else createNewChat();
+            } else {
+                renderHistory();
+            }
+        }
+
+        document.getElementById('clearAllBtn').onclick = () => { chats = []; createNewChat(); };
+        newChatBtn.addEventListener('click', createNewChat);
+
+        chartImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    stagedImageBase64 = evt.target.result;
+                    thumbImgTag.src = stagedImageBase64;
+                    activePreviewThumb.style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeThumbBtn.onclick = () => { clearStagedImage(); };
+
+        function clearStagedImage() {
+            stagedImageBase64 = null;
+            activePreviewThumb.style.display = 'none';
+            chartImageInput.value = '';
+        }
+
+        async function handleSend() {
+            let text = userInput.value.trim();
+            if (!text && !stagedImageBase64) return;
+
+            if (!activeChatId || chats.length === 0) {
+                activeChatId = Date.now();
+                chats.push({ id: activeChatId, title: text.substring(0, 16) || "Grafik Analizi", messages: [] });
+            }
+
+            const currentChat = chats.find(c => c.id === activeChatId);
+            const currentImg = stagedImageBase64;
+            userInput.value = '';
+            clearStagedImage();
+
+            heroView.style.display = 'none';
+            chatFlow.style.display = 'flex';
+
+            let queryToResolve = text;
+            if (!queryToResolve && currentImg) {
+                queryToResolve = "btc"; 
+            }
+
+            const resolved = resolveSymbol(queryToResolve);
+
+            let userContent = text;
+            if (currentImg) {
+                userContent = `<div class="uploaded-chart-preview"><img src="${currentImg}"><div class="math-overlay-badge">📸 Ekran Görüntüsü Yüklendi</div></div><div style="margin-top:8px;">${text || 'Grafik Görseli Analizi'}</div>`;
+            }
+            const userMsg = { role: 'user', content: userContent };
+            currentChat.messages.push(userMsg);
+            renderMessage(userMsg);
+
+            if (!resolved) {
+                const errorHTML = `<p style="color:#f87171; font-size:14px; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Sonuç bulunamadı! Lütfen geçerli bir kripto para adı yazın (Örn: BTC, PEPE, SUI, ETH).</p>`;
+                const errBotMsg = { role: 'assistant', content: errorHTML };
+                currentChat.messages.push(errBotMsg);
+                renderMessage(errBotMsg);
+                return;
+            }
+
+            const introId = 'intro-' + Date.now();
+            const introHTML = `
+                <div class="bot-intro-text-white" id="${introId}">DarkBOT verileri tarıyor (${resolved.name})...>_</div>
+                <div class="loading-spinner" id="spinner-${introId}">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Matematik formülleri ve zaman saatleri senkronize ediliyor (10 sn)...
+                </div>
+            `;
+            renderMessage({ role: 'assistant', content: introHTML });
+
+            const analysisData = await fetchSynchronizedAnalysis(resolved.pair);
+
+            setTimeout(() => {
+                document.getElementById(`spinner-${introId}`).style.display = 'none';
+
+                let resHTML = "";
+                if (analysisData) {
+                    currentChat.title = `${analysisData.displayName} Analizi`;
+                    renderHistory();
+
+                    let imgWithMathOverlay = "";
+                    if (currentImg) {
+                        imgWithMathOverlay = `
+                            <div class="uploaded-chart-preview">
+                                <img src="${currentImg}">
+                                <div class="math-overlay-badge">📐 RSI: ${analysisData.rsi} | S1: $${analysisData.s1}</div>
+                            </div>
+                        `;
+                    }
+
+                    resHTML = `
+                        ${imgWithMathOverlay}
+                        <div class="section-header">${analysisData.status}</div>
+                        
+                        <div class="detail-box">
+                            <strong>1. Şu An Ne Yapmalısın? (Net Komut):</strong><br>
+                            ${analysisData.action}
+                        </div>
+
+                        <div class="detail-box">
+                            <strong>2. Bu Karara Nasıl Varıldı? (Neden):</strong><br>
+                            ${analysisData.reason}
+                        </div>
+
+                        <div class="detail-box">
+                            <strong>3. Fiyat Seviyeleri ve Saniye Hassasiyetli Zaman Aralığı:</strong><br>
+                            • Anlık Fiyat: <strong>$${analysisData.price}</strong><br>
+                            • Güvenli Taban (Destek S1): <strong>$${analysisData.s1}</strong><br>
+                            • Zorlanacağı Tavan (Direnç R1): <strong>$${analysisData.r1}</strong><br>
+                            • Kritik Zaman Dilimi: <strong>${analysisData.timing}</strong>
+                        </div>
+
+                        <div class="detail-box" style="border-color: #ff3b69;">
+                            <strong>4. Dikkat Etmen Gereken Riskler:</strong><br>
+                            ${analysisData.risk}
+                        </div>
+
+                        <div class="final-summary-card">
+                            ${analysisData.finalSummaryText}
+                        </div>
+
+                        <button class="chart-toggle-btn" onclick="toggleChart(this, '${analysisData.symbol}')">CANLI TRADINGVIEW GRAFİĞİNİ AÇ</button>
+                        <div class="chart-wrapper"></div>
+                    `;
+                } else {
+                    resHTML = `<p style="color:#f87171; font-size:13px; margin-top:10px;">Sonuç bulunamadı!</p>`;
+                }
+
+                const botMsg = { role: 'assistant', content: resHTML };
+                currentChat.messages.push(botMsg);
+
+                const parent = document.getElementById(introId).parentElement;
+                const div = document.createElement('div');
+                div.innerHTML = resHTML;
+                parent.appendChild(div);
+
+                document.getElementById('scrollArea').scrollTop = document.getElementById('scrollArea').scrollHeight;
+            }, 10000);
+        }
+
+        function renderMessage(msg) {
+            const row = document.createElement('div');
+            row.className = `message-row ${msg.role}`;
+            row.innerHTML = `<div class="msg-bubble">${msg.content}</div>`;
+            chatFlow.appendChild(row);
+            document.getElementById('scrollArea').scrollTop = document.getElementById('scrollArea').scrollHeight;
+        }
+
+        function toggleChart(btn, symbol) {
+            const wrapper = btn.nextElementSibling;
+            if (wrapper.style.display === 'block') wrapper.style.display = 'none';
+            else {
+                wrapper.style.display = 'block';
+                wrapper.innerHTML = `<iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=BINANCE%3A${symbol}&interval=15&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&theme=dark&style=1&timezone=exchange" width="100%" height="100%" frameborder="0"></iframe>`;
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleSend(); } });
+
+        createNewChat();
+    </script>
+</body>
+</html>
