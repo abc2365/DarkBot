@@ -13,7 +13,6 @@
             --accent-glow: rgba(255, 59, 105, 0.4);
             --border-red: rgba(255, 59, 105, 0.2);
             --text-muted: #8c7380;
-            --discord-blue: #5865F2;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -21,20 +20,21 @@
             background-color: var(--bg-dark);
             color: #ffffff;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             background-image: radial-gradient(circle at 50% 45%, #3d0718 0%, #160309 50%, #060103 100%);
         }
 
-        /* KİLİT EKRANI (TAM ORİJİNAL LOGO & İPUCUSUZ ŞİFRE) */
+        /* KİLİT EKRANI */
         .lock-screen {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: #040103; z-index: 9999; display: flex;
-            align-items: center; justify-content: center;
+            align-items: center; justify-content: center; padding: 20px;
         }
         .lock-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 20px;
             background: rgba(18, 7, 13, 0.9); border: 1px solid var(--border-red);
-            border-radius: 20px; padding: 35px 30px; width: 380px;
+            border-radius: 20px; padding: 35px 25px; width: 100%; max-width: 380px;
             box-shadow: 0 0 40px rgba(255, 59, 105, 0.25);
             backdrop-filter: blur(12px); text-align: center;
         }
@@ -56,12 +56,13 @@
         }
         .lock-btn:hover { transform: translateY(-1px); opacity: 0.95; }
 
-        .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
+        .app-container { display: flex; height: 100vh; height: 100dvh; width: 100vw; position: relative; }
         
-        /* SOL PANEL */
+        /* SOL PANEL (SIDEBAR) */
         .sidebar {
             width: 260px; background: rgba(10, 3, 6, 0.95); border-right: 1px solid var(--border-red);
             display: flex; flex-direction: column; padding: 14px; justify-content: space-between; z-index: 10;
+            transition: transform 0.3s ease;
         }
         .new-chat-btn {
             background: var(--accent-pink); color: #fff; border: none; border-radius: 8px;
@@ -77,75 +78,76 @@
         }
         .history-item:hover, .history-item.active { background: rgba(255, 59, 105, 0.25); }
 
-        .sidebar-footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
         .user-profile {
             display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; border-radius: 8px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; overflow: hidden; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; overflow: hidden; flex-shrink: 0; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .nav-item { font-size: 12px; color: #bbb; padding: 6px 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; text-decoration: none; transition: 0.2s; }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        
-        .discord-btn {
-            background-color: var(--discord-blue);
-            color: #ffffff !important;
-            font-weight: 600;
-            box-shadow: 0 0 12px rgba(88, 101, 242, 0.4);
-        }
-        .discord-btn:hover { background-color: #4752c4; }
 
-        /* ANA EKRAN & DARE LOGOLAR */
-        .main-container { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
-        .top-bar { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,59,105,0.1); }
+        /* MOBİL OVERLAY BANNER */
+        .sidebar-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 9; backdrop-filter: blur(4px);
+        }
+
+        /* ANA EKRAN */
+        .main-container { flex-grow: 1; display: flex; flex-direction: column; position: relative; width: 100%; }
+        .top-bar { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid rgba(255,59,105,0.1); }
         .top-logo-area { display: flex; align-items: center; gap: 10px; color: var(--accent-pink); font-size: 16px; font-weight: 700; }
         
-        /* Yapay Zeka İçinde Daire Logo */
+        .menu-toggle-btn {
+            display: none; background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; margin-right: 10px;
+        }
+
         .circle-logo-top {
             width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
-            border: 2px solid var(--accent-pink); box-shadow: 0 0 10px var(--accent-glow);
+            border: 2px solid var(--accent-pink); box-shadow: 0 0 10px var(--accent-glow); flex-shrink: 0;
         }
         .circle-logo-hero {
             width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
             border: 2px solid var(--accent-pink); box-shadow: 0 0 25px var(--accent-glow); margin-bottom: 15px;
         }
 
-        .chat-scroll-area { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .chat-scroll-area { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; align-items: center; }
 
-        .hero-container { margin-top: 10vh; text-align: center; }
-        .hero-title { font-size: 48px; font-weight: 800; letter-spacing: -1px; }
+        .hero-container { margin-top: 6vh; text-align: center; padding: 0 10px; }
+        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 800; letter-spacing: -1px; }
         .hero-title span { color: var(--accent-pink); text-shadow: 0 0 25px var(--accent-pink); }
-        .hero-subtitle { font-size: 16px; font-weight: 700; color: #fff; margin-top: 10px; }
-        .hero-tags { font-size: 10px; letter-spacing: 2px; color: var(--accent-pink); font-weight: 700; margin-top: 6px; }
+        .hero-subtitle { font-size: clamp(13px, 4vw, 16px); font-weight: 700; color: #fff; margin-top: 10px; }
+        .hero-tags { font-size: clamp(9px, 2.5vw, 10px); letter-spacing: 1.5px; color: var(--accent-pink); font-weight: 700; margin-top: 6px; }
 
-        .chat-flow { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 120px; }
-        .message-row { display: flex; gap: 14px; width: 100%; }
+        .chat-flow { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 16px; padding-bottom: 120px; }
+        .message-row { display: flex; gap: 10px; width: 100%; }
         .message-row.user { justify-content: flex-end; }
-        .msg-bubble { max-width: 92%; padding: 18px 22px; border-radius: 12px; font-size: 14px; line-height: 1.7; }
+        .msg-bubble { max-width: 95%; padding: 14px 18px; border-radius: 12px; font-size: 14px; line-height: 1.6; word-break: break-word; }
         .message-row.user .msg-bubble { background: rgba(0,0,0,0.6); border: 1px solid var(--border-red); color: #fff; }
         .message-row.assistant .msg-bubble { background: rgba(20, 8, 14, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #f0f0f0; width: 100%; backdrop-filter: blur(10px); }
 
-        .bot-intro-text-white { color: #ffffff !important; font-family: monospace; font-size: 14px; font-weight: 600; line-height: 1.5; }
-        .loading-spinner { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--accent-pink); font-size: 13px; font-family: monospace; }
+        .bot-intro-text-white { color: #ffffff !important; font-family: monospace; font-size: 13px; font-weight: 600; line-height: 1.5; }
+        .loading-spinner { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--accent-pink); font-size: 12px; font-family: monospace; }
 
-        .section-header { font-size: 13px; font-weight: 700; color: var(--accent-pink); margin: 16px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,59,105,0.2); padding-bottom: 4px; }
-        .detail-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+        .section-header { font-size: 12px; font-weight: 700; color: var(--accent-pink); margin: 14px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,59,105,0.2); padding-bottom: 4px; }
+        .detail-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
         .detail-box strong { color: #ff3b69; }
 
         .final-summary-card {
             background: linear-gradient(135deg, rgba(255, 59, 105, 0.25) 0%, rgba(10, 3, 6, 0.9) 100%);
             border: 2px solid var(--accent-pink);
-            padding: 18px; border-radius: 12px; margin-top: 16px; font-size: 14px; line-height: 1.7;
+            padding: 14px; border-radius: 12px; margin-top: 14px; font-size: 13px; line-height: 1.6;
             box-shadow: 0 0 20px rgba(255, 59, 105, 0.2);
         }
 
-        .chart-toggle-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; margin-top: 14px; }
-        .chart-wrapper { margin-top: 14px; height: 380px; width: 100%; border-radius: 8px; overflow: hidden; display: none; border: 1px solid var(--border-red); }
+        .chart-toggle-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; margin-top: 12px; width: 100%; }
+        .chart-wrapper { margin-top: 12px; height: 320px; width: 100%; border-radius: 8px; overflow: hidden; display: none; border: 1px solid var(--border-red); }
 
-        .uploaded-chart-preview { margin-top: 12px; border: 2px dashed var(--accent-pink); border-radius: 10px; padding: 10px; background: rgba(0,0,0,0.6); position: relative; max-width: 420px; }
+        .uploaded-chart-preview { margin-top: 12px; border: 2px dashed var(--accent-pink); border-radius: 10px; padding: 8px; background: rgba(0,0,0,0.6); position: relative; max-width: 100%; }
         .uploaded-chart-preview img { width: 100%; border-radius: 6px; display: block; }
-        .math-overlay-badge { position: absolute; bottom: 16px; right: 16px; background: rgba(7, 2, 4, 0.9); border: 1px solid var(--accent-pink); color: #ff3b69; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-family: monospace; font-weight: bold; box-shadow: 0 0 10px var(--accent-glow); }
+        .math-overlay-badge { position: absolute; bottom: 12px; right: 12px; background: rgba(7, 2, 4, 0.9); border: 1px solid var(--accent-pink); color: #ff3b69; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-family: monospace; font-weight: bold; box-shadow: 0 0 10px var(--accent-glow); }
 
         .active-preview-thumb {
             display: none; align-items: center; justify-content: space-between;
@@ -154,43 +156,56 @@
         }
         .active-preview-thumb img { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
 
-        .input-bar-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 720px; padding: 0 20px; z-index: 5; }
+        .input-bar-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 720px; padding: 0 12px; z-index: 5; }
         .input-box {
-            background: rgba(12, 4, 8, 0.85); border: 1px solid var(--border-red); border-radius: 16px;
-            padding: 14px 18px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+            background: rgba(12, 4, 8, 0.92); border: 1px solid var(--border-red); border-radius: 16px;
+            padding: 12px 14px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
         }
         .input-box textarea { background: transparent; border: none; outline: none; color: #fff; font-size: 14px; resize: none; height: 26px; }
         .input-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
         .input-tools { display: flex; gap: 14px; color: var(--accent-pink); cursor: pointer; font-size: 16px; align-items: center; }
-        .send-btn { background: var(--accent-pink); border: none; width: 34px; height: 34px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px var(--accent-glow); }
+        .send-btn { background: var(--accent-pink); border: none; width: 34px; height: 34px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px var(--accent-glow); flex-shrink: 0; }
 
         /* FULL EKRAN DÜNYA HUB */
         .hub-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #070204; z-index: 99999;
             display: none; flex-direction: column;
         }
-        .hub-topbar { height: 50px; background: rgba(10,3,6,0.95); border-bottom: 1px solid var(--border-red); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .back-btn { background: var(--accent-pink); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px var(--accent-glow); }
-        .hub-body { display: flex; flex-grow: 1; height: calc(100vh - 50px); }
-        .hub-sidebar { width: 300px; background: rgba(12, 4, 8, 0.95); border-right: 1px solid var(--border-red); display: flex; flex-direction: column; padding: 14px; gap: 10px; }
-        .hub-search { background: rgba(0,0,0,0.6); border: 1px solid var(--border-red); border-radius: 8px; padding: 10px; color: #fff; outline: none; font-size: 13px; width: 100%; }
+        .hub-topbar { height: 50px; background: rgba(10,3,6,0.95); border-bottom: 1px solid var(--border-red); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; gap: 8px; }
+        .back-btn { background: var(--accent-pink); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px var(--accent-glow); flex-shrink: 0; }
+        .hub-body { display: flex; flex-grow: 1; height: calc(100vh - 50px); height: calc(100dvh - 50px); flex-direction: row; }
+        .hub-sidebar { width: 280px; background: rgba(12, 4, 8, 0.95); border-right: 1px solid var(--border-red); display: flex; flex-direction: column; padding: 10px; gap: 8px; flex-shrink: 0; }
+        .hub-search { background: rgba(0,0,0,0.6); border: 1px solid var(--border-red); border-radius: 8px; padding: 8px 10px; color: #fff; outline: none; font-size: 12px; width: 100%; }
         .hub-coin-list { list-style: none; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
-        .hub-coin-item { padding: 10px 12px; background: rgba(255,59,105,0.08); border: 1px solid var(--border-red); border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; color: #fff; }
+        .hub-coin-item { padding: 8px 10px; background: rgba(255,59,105,0.08); border: 1px solid var(--border-red); border-radius: 8px; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; color: #fff; }
         .hub-coin-item:hover, .hub-coin-item.active { background: rgba(255,59,105,0.25); }
         .hub-chart-area { flex-grow: 1; background: #000; }
 
         /* MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: #0d0408; border: 1px solid var(--border-red); border-radius: 12px; width: 360px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; padding: 15px; }
+        .modal { background: #0d0408; border: 1px solid var(--border-red); border-radius: 12px; width: 100%; max-width: 360px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 11px; color: var(--text-muted); }
         .form-group input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; color: #fff; outline: none; }
         .save-btn { background: var(--accent-pink); border: none; color: #fff; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+
+        /* RESPONSIVE MEDYA SORUGULARI */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed; top: 0; bottom: 0; left: 0; transform: translateX(-100%);
+                z-index: 99; width: 250px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            .hub-body { flex-direction: column; }
+            .hub-sidebar { width: 100%; height: 180px; border-right: none; border-bottom: 1px solid var(--border-red); }
+        }
     </style>
 </head>
 <body>
 
-    <!-- KİLİT EKRANI (ŞİFRE İPUCUSUZ & TAM DÜZGÜN LOGO) -->
+    <!-- KİLİT EKRANI -->
     <div class="lock-screen" id="lockScreen">
         <div class="lock-wrapper">
             <img src="DarkBot.png" alt="DarkBOT Logo" class="lock-logo-full" onerror="this.src='https://via.placeholder.com/320x160/ff3b69/ffffff?text=DarkBOT'">
@@ -200,16 +215,19 @@
         </div>
     </div>
 
+    <!-- MOBİL İÇİN SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- FULL EKRAN DÜNYA HUB -->
     <div class="hub-overlay" id="hubOverlay">
         <div class="hub-topbar">
-            <button class="back-btn" id="hubBackBtn"><i class="fa-solid fa-arrow-left"></i> Geri (Yapay Zekaya Dön)</button>
-            <div style="color:var(--accent-pink); font-weight:700; font-size:15px;"><i class="fa-solid fa-globe"></i> DarkBOT 30.000+ Kripto Grafik Merkezi</div>
-            <div style="width: 130px;"></div>
+            <button class="back-btn" id="hubBackBtn"><i class="fa-solid fa-arrow-left"></i> Geri</button>
+            <div style="color:var(--accent-pink); font-weight:700; font-size:13px; text-align:center;"><i class="fa-solid fa-globe"></i> 30.000+ Kripto Grafik Merkezi</div>
+            <div style="width: 50px;"></div>
         </div>
         <div class="hub-body">
             <div class="hub-sidebar">
-                <input type="text" class="hub-search" id="hubSearchInput" placeholder="Tüm coinlerde ara (örn: PEPE, SOL, SUI)...">
+                <input type="text" class="hub-search" id="hubSearchInput" placeholder="Coin ara (PEPE, SOL, SUI)...">
                 <ul class="hub-coin-list" id="hubCoinList"></ul>
             </div>
             <div class="hub-chart-area" id="hubChartContainer">
@@ -219,7 +237,7 @@
     </div>
 
     <div class="app-container">
-        <!-- SOL PANEL -->
+        <!-- SOL PANEL (SIDEBAR) -->
         <div class="sidebar" id="sidebar">
             <div>
                 <button class="new-chat-btn" id="newChatBtn"><i class="fa-solid fa-plus"></i> Yeni Sohbet</button>
@@ -231,14 +249,11 @@
             <div class="sidebar-footer">
                 <div class="user-profile" id="openProfileBtn">
                     <div class="avatar" id="sidebarAvatar">K</div>
-                    <div style="display:flex; flex-direction:column;">
-                        <span style="font-size:12px; font-weight:600;" id="displayUsername">KULLANICI</span>
+                    <div style="display:flex; flex-direction:column; overflow:hidden;">
+                        <span style="font-size:12px; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" id="displayUsername">KULLANICI</span>
                         <span style="font-size:10px; color:var(--text-muted);" id="chatCounter">0 sohbet</span>
                     </div>
                 </div>
-                <a href="https://discord.gg/HPFRgjKYn" target="_blank" class="nav-item discord-btn">
-                    <i class="fa-brands fa-discord"></i> Discord
-                </a>
                 <div class="nav-item" id="settingsBtn"><i class="fa-solid fa-gear"></i> Ayarlar</div>
             </div>
         </div>
@@ -247,7 +262,7 @@
         <div class="main-container">
             <div class="top-bar">
                 <div class="top-logo-area">
-                    <!-- Yapay zeka modundaki daire logo -->
+                    <button class="menu-toggle-btn" id="menuToggleBtn"><i class="fa-solid fa-bars"></i></button>
                     <img src="DarkBot.png" alt="Logo" class="circle-logo-top" onerror="this.src='https://via.placeholder.com/32/ff3b69/ffffff?text=DB'">
                     <span>DarkBOT Asistan</span>
                 </div>
@@ -255,7 +270,6 @@
 
             <div class="chat-scroll-area" id="scrollArea">
                 <div class="hero-container" id="heroView">
-                    <!-- Karşılama ekranındaki daire logo -->
                     <img src="DarkBot.png" alt="DarkBOT Logo" class="circle-logo-hero" onerror="this.src='https://via.placeholder.com/90/ff3b69/ffffff?text=DB'">
                     <div class="hero-title">Dark<span>BOT</span></div>
                     <div class="hero-subtitle">30.000+ Kripto Destekli Pro Analiz Asistanı</div>
@@ -309,6 +323,7 @@
     </div>
 
     <script>
+        /* KİLİT EKRANI */
         const passInput = document.getElementById('passInput');
         const unlockBtn = document.getElementById('unlockBtn');
         function checkPass() {
@@ -321,10 +336,24 @@
         unlockBtn.addEventListener('click', checkPass);
         passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkPass(); });
 
+        /* MOBİL MENU TOGGLE */
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        menuToggleBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        /* PROFİL AYARLARI */
         let userAvatarData = null;
         const profileModal = document.getElementById('profileModal');
-        document.getElementById('openProfileBtn').addEventListener('click', () => profileModal.style.display = 'flex');
-        document.getElementById('settingsBtn').addEventListener('click', () => profileModal.style.display = 'flex');
+        document.getElementById('openProfileBtn').addEventListener('click', () => { profileModal.style.display = 'flex'; if (window.innerWidth <= 768) toggleSidebar(); });
+        document.getElementById('settingsBtn').addEventListener('click', () => { profileModal.style.display = 'flex'; if (window.innerWidth <= 768) toggleSidebar(); });
 
         document.getElementById('avatarFileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -346,6 +375,7 @@
             profileModal.style.display = 'none';
         });
 
+        /* COIN LİSTESİ */
         const massiveCoinsList = [
             { name: 'Bitcoin (BTC)', symbol: 'BTCUSDT' },
             { name: 'Ethereum (ETH)', symbol: 'ETHUSDT' },
@@ -537,6 +567,7 @@
             chatFlow.style.display = 'none';
             heroView.style.display = 'block';
             clearStagedImage();
+            if (sidebar.classList.contains('open')) toggleSidebar();
         }
 
         function renderHistory() {
@@ -566,6 +597,7 @@
             chatFlow.innerHTML = '';
             chat.messages.forEach(msg => renderMessage(msg));
             renderHistory();
+            if (sidebar.classList.contains('open')) toggleSidebar();
         }
 
         function deleteChat(e, id) {
@@ -636,7 +668,7 @@
             renderMessage(userMsg);
 
             if (!resolved) {
-                const errorHTML = `<p style="color:#f87171; font-size:14px; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Sonuç bulunamadı! Lütfen geçerli bir kripto para adı yazın (Örn: BTC, PEPE, SUI, ETH).</p>`;
+                const errorHTML = `<p style="color:#f87171; font-size:13px; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Sonuç bulunamadı! Lütfen geçerli bir kripto para adı yazın (Örn: BTC, PEPE, SUI, ETH).</p>`;
                 const errBotMsg = { role: 'assistant', content: errorHTML };
                 currentChat.messages.push(errBotMsg);
                 renderMessage(errBotMsg);
@@ -655,7 +687,8 @@
             const analysisData = await fetchSynchronizedAnalysis(resolved.pair);
 
             setTimeout(() => {
-                document.getElementById(`spinner-${introId}`).style.display = 'none';
+                const spinnerEl = document.getElementById(`spinner-${introId}`);
+                if(spinnerEl) spinnerEl.style.display = 'none';
 
                 let resHTML = "";
                 if (analysisData) {
@@ -713,10 +746,13 @@
                 const botMsg = { role: 'assistant', content: resHTML };
                 currentChat.messages.push(botMsg);
 
-                const parent = document.getElementById(introId).parentElement;
-                const div = document.createElement('div');
-                div.innerHTML = resHTML;
-                parent.appendChild(div);
+                const introEl = document.getElementById(introId);
+                if (introEl && introEl.parentElement) {
+                    const parent = introEl.parentElement;
+                    const div = document.createElement('div');
+                    div.innerHTML = resHTML;
+                    parent.appendChild(div);
+                }
 
                 document.getElementById('scrollArea').scrollTop = document.getElementById('scrollArea').scrollHeight;
             }, 10000);
